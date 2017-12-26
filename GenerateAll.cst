@@ -1,0 +1,61 @@
+﻿<%@ Template Language="C#" TargetLanguage="Text" %>
+<%@ Property Type="DatabaseSchema" Name="DatabaseSchema" %>
+<%@ Property Default="GXEIS" Type="System.String" Name="NameSpace" %>
+<%@ Property Name="Author" Type="System.String" Default="CodeSmith" Category="Property" Description="作者名"%>
+<%@ Assembly Name="SchemaExplorer" %>
+<%@ Import Namespace="SchemaExplorer" %>
+<%@ Register Name="DAL" Template="DAL.cst" %>
+<%@ Register Name="BLL" Template="BLL.cst" %>
+<%@ Register Name="Model" Template="Model.cst" %>
+<%Generate(); %>
+<script runat="template">
+    private string _outputDirectory;
+    [Editor(typeof(System.Windows.Forms.Design.FolderNameEditor),typeof(System.Drawing.Design.UITypeEditor))]
+    public string OutputDirectory
+    {
+        set{_outputDirectory=value;}
+        get{return _outputDirectory;}
+    }
+    public void Generate()
+    {
+		DAL dal=new DAL();
+        foreach(var i in DatabaseSchema.Tables)
+        {
+            dal.SetProperty("Author",Author);            
+            dal.SetProperty("NameSpace",NameSpace);
+            dal.SetProperty("SourceTable",i);
+            this.CopyPropertiesTo(dal);
+            dal.RenderToFile(System.IO.Path.Combine(OutputDirectory+@"\DAL\",GetClassName(i)+".cs" ), true);
+    		Response.WriteLine("Rendering: "+GetClassName(i)+".cs");
+        }
+        BLL bll=new BLL();
+        foreach(var i in DatabaseSchema.Tables)
+        {
+            dal.SetProperty("Author",Author);            
+            bll.SetProperty("NameSpace",NameSpace);
+            bll.SetProperty("SourceTable",i);
+            this.CopyPropertiesTo(bll);
+            bll.RenderToFile(System.IO.Path.Combine(OutputDirectory+@"\BLL\",GetClassName(i)+".cs" ), true);
+    		Response.WriteLine("Rendering: "+GetClassName(i)+".cs");
+        }
+         Model model=new Model();
+        foreach(var i in DatabaseSchema.Tables)
+        {
+            dal.SetProperty("Author",Author);            
+            model.SetProperty("NameSpace",NameSpace);
+            model.SetProperty("SourceTable",i);
+            this.CopyPropertiesTo(model);
+            model.RenderToFile(System.IO.Path.Combine(OutputDirectory+@"\Model\",GetClassName(i)+".cs" ), true);
+    		Response.WriteLine("Rendering: "+GetClassName(i)+".cs");
+        }
+    }
+    /// <summary>
+/// 获取类名(截取后缀s)
+/// </summary>
+/// <param name="table">TableSchema</param>
+/// <returns>类名</returns>
+public string GetClassName(TableSchema table)
+{
+		return table.Name;
+}
+</script>

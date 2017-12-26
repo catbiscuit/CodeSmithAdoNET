@@ -1,0 +1,642 @@
+﻿<%@ Template Language="C#" TargetLanguage="C#" %>
+<%@ Assembly Name="SchemaExplorer" %>
+<%@ Import Namespace="SchemaExplorer" %>
+<%@ Property Name="SourceTable" Type="SchemaExplorer.TableSchema" Category="数据库" %>
+<%@ Property Name="NameSpace" Type="String" Description="命名空间" %>
+<%@ Property Name="Author" Type="System.String" Default="CodeSmith" Category="Property" Description="作者名"%>
+using System;
+using System.Data;
+using System.Text;
+using System.Collections.Generic;
+using System.Data.SqlClient;
+using GXEIS.DBUtility;
+
+namespace <%=NameSpace %>.DAL
+{
+    /// <summary>
+    /// 功能: 实体类 (<%=SourceTable.Description%>)
+    /// 创建人：<%=Author%>     
+    /// 创建日期：<%=DateTime.Now.ToShortDateString() %>    
+    /// </summary>
+    public partial class <%=SourceTable.Name %>
+    {
+        public <%=SourceTable.Name %>()
+        {}
+        #region 生成的方法
+		/// <summary>
+		/// 是否存在该记录
+		/// </summary>
+        public bool Exists(<%=GetPrimaryKeyParas(SourceTable)%>)
+        {
+            StringBuilder strSql=new StringBuilder();
+            strSql.Append(" select count(1) from <%=SourceTable.Name%> ");
+            strSql.Append(" where <%=GetPrimaryKeyWhere(SourceTable)%> ");
+            SqlParameter[] parameters=
+            {
+                <%System.Collections.Generic.List<int> lstPrimary=new System.Collections.Generic.List<int>();%>
+                <%for(int i=0; i<SourceTable.Columns.Count; i++) {%>
+                <%if(SourceTable.Columns[i].IsPrimaryKeyMember) {%>
+                <%lstPrimary.Add(i);}}%>                
+                <%for(int i=0; i<lstPrimary.Count; i++) {%>                
+                <%if(i == lstPrimary.Count -1){%>
+                new SqlParameter("@<%=SourceTable.Columns[lstPrimary[i]].Name%>", <%=GetSqlDbType(SourceTable.Columns[lstPrimary[i]])%>,<%=SourceTable.Columns[lstPrimary[i]].Size%>)                         
+                <%}else{%>
+                new SqlParameter("@<%=SourceTable.Columns[lstPrimary[i]].Name%>", <%=GetSqlDbType(SourceTable.Columns[lstPrimary[i]])%>,<%=SourceTable.Columns[lstPrimary[i]].Size%>),
+                <%}%>                
+                <%}%>
+            };
+            <%int iIndex=0;%>
+            <%for(int i=0; i<SourceTable.Columns.Count; i++) {%>
+            <%if(SourceTable.Columns[i].IsPrimaryKeyMember) {%>
+            parameters[<%=iIndex%>].Value = <%=SourceTable.Columns[i].Name%>;
+            <%iIndex++;%>
+            <%}%>
+            <%}%>
+            
+            return DbHelperSQL.Exists(strSql.ToString(),parameters);
+        }
+        
+        /// <summary>
+        /// 增加一条数据
+        /// </summary>
+        public bool Add(<%=NameSpace%>.Model.<%=SourceTable.Name%> model)
+        {
+            StringBuilder strSql=new StringBuilder();
+            strSql.Append(" insert into <%=SourceTable.Name%>( ");
+            strSql.Append(" <%=GetColumnNameList(SourceTable)%>) ");
+            strSql.Append(" values ( ");
+            strSql.Append(" <%=GetColumnNameListPara(SourceTable)%>) ");
+            SqlParameter[] parameters = 
+            {
+                <%for(int i=0; i<SourceTable.Columns.Count; i++) {%>
+                <%if(i == SourceTable.Columns.Count -1){%>new SqlParameter("@<%=SourceTable.Columns[i].Name%>", <%=GetSqlDbType(SourceTable.Columns[i])%>,<%=SourceTable.Columns[i].Size%>)<%}else{%>new SqlParameter("@<%=SourceTable.Columns[i].Name%>", <%=GetSqlDbType(SourceTable.Columns[i])%>,<%=SourceTable.Columns[i].Size%>),<%}%>
+                <%}%>
+            };
+            <%for(int i=0; i<SourceTable.Columns.Count; i++) {%>
+            parameters[<%=i%>].Value = model.<%=SourceTable.Columns[i].Name%>;
+            <%}%>
+
+            int rows=DbHelperSQL.ExecuteSql(strSql.ToString(),parameters);
+			if (rows > 0)
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+        }
+        
+        /// <summary>
+        /// 删除数据
+        /// </summary>
+        public bool Delete(<%=GetPrimaryKeyParas(SourceTable)%>)
+        {
+            StringBuilder strSql=new StringBuilder();
+            strSql.Append(" delete from <%=SourceTable.Name%> ");
+            strSql.Append(" where <%=GetPrimaryKeyWhere(SourceTable)%> ");
+            SqlParameter[] parameters=
+            {
+                <%System.Collections.Generic.List<int> lstPrimarydDel=new System.Collections.Generic.List<int>();%>
+                <%for(int i=0; i<SourceTable.Columns.Count; i++) {%>
+                <%if(SourceTable.Columns[i].IsPrimaryKeyMember) {%>
+                <%lstPrimarydDel.Add(i);}}%>                
+                <%for(int i=0; i<lstPrimarydDel.Count; i++) {%>                
+                <%if(i == lstPrimarydDel.Count -1){%>
+                new SqlParameter("@<%=SourceTable.Columns[lstPrimarydDel[i]].Name%>", <%=GetSqlDbType(SourceTable.Columns[lstPrimarydDel[i]])%>,<%=SourceTable.Columns[lstPrimarydDel[i]].Size%>)                         
+                <%}else{%>
+                new SqlParameter("@<%=SourceTable.Columns[lstPrimarydDel[i]].Name%>", <%=GetSqlDbType(SourceTable.Columns[lstPrimarydDel[i]])%>,<%=SourceTable.Columns[lstPrimarydDel[i]].Size%>),
+                <%}%>                
+                <%}%>
+            };
+            <%int iIndexDel=0;%>
+            <%for(int i=0; i<SourceTable.Columns.Count; i++) {%>
+            <%if(SourceTable.Columns[i].IsPrimaryKeyMember) {%>
+            parameters[<%=iIndexDel%>].Value = <%=SourceTable.Columns[i].Name%>;
+            <%iIndexDel++;%>
+            <%}%>
+            <%}%>
+
+            int rows=DbHelperSQL.ExecuteSql(strSql.ToString(),parameters);
+            if (rows > 0)
+            {
+            	return true;
+            }
+            else
+            {
+            	return false;
+            }
+        }
+        
+        /// <summary>
+        /// 更新一条数据
+        /// </summary>
+        public bool Update(<%=NameSpace%>.Model.<%=SourceTable.Name%> model)
+        {
+            StringBuilder strSql=new StringBuilder();
+            strSql.Append(" update <%=SourceTable.Name%> set ");    
+            <%System.Collections.Generic.List<int> lstUpdatePrimary=new System.Collections.Generic.List<int>();%>
+            <%System.Collections.Generic.List<int> lstUpdateNoPrimary=new System.Collections.Generic.List<int>();%>
+            <%for(int i=0; i<SourceTable.Columns.Count; i++) {%>
+            <%if(SourceTable.Columns[i].IsPrimaryKeyMember) {%>
+            <%lstUpdatePrimary.Add(i);%>     
+            <%}else{lstUpdateNoPrimary.Add(i);}}%>
+            <%for(int i=0; i<lstUpdateNoPrimary.Count; i++) {%>                              
+            <%if(i == lstUpdateNoPrimary.Count -1){%>
+            strSql.Append(" <%=SourceTable.Columns[lstUpdateNoPrimary[i]].Name%>=@<%=SourceTable.Columns[lstUpdateNoPrimary[i]].Name%>");            
+            <%}else{%>
+            strSql.Append(" <%=SourceTable.Columns[lstUpdateNoPrimary[i]].Name%>=@<%=SourceTable.Columns[lstUpdateNoPrimary[i]].Name%>,");
+            <%}%>                
+            <%}%>            
+            strSql.Append(" where <%=GetPrimaryKeyWhere(SourceTable)%> ");
+            SqlParameter[] parameters = 
+            {
+                <%for(int i=0; i<lstUpdateNoPrimary.Count; i++) {%>   
+                new SqlParameter("@<%=SourceTable.Columns[lstUpdateNoPrimary[i]].Name%>", <%=GetSqlDbType(SourceTable.Columns[lstUpdateNoPrimary[i]])%>,<%=SourceTable.Columns[lstUpdateNoPrimary[i]].Size%>),                        
+                <%}%>
+                <%for(int i=0; i<lstUpdatePrimary.Count; i++) {%>                
+                <%if(i == lstUpdatePrimary.Count -1){%>
+                new SqlParameter("@<%=SourceTable.Columns[lstUpdatePrimary[i]].Name%>", <%=GetSqlDbType(SourceTable.Columns[lstUpdatePrimary[i]])%>,<%=SourceTable.Columns[lstUpdatePrimary[i]].Size%>)                         
+                <%}else{%>
+                new SqlParameter("@<%=SourceTable.Columns[lstUpdatePrimary[i]].Name%>", <%=GetSqlDbType(SourceTable.Columns[lstUpdatePrimary[i]])%>,<%=SourceTable.Columns[lstUpdatePrimary[i]].Size%>),
+                <%}%>                
+                <%}%>                            
+            };
+            
+            <%int iUpdateIndex=0;%>
+            <%for(int i=0; i<SourceTable.Columns.Count; i++) {%>
+            <%if(!SourceTable.Columns[i].IsPrimaryKeyMember) {%>
+            parameters[<%=iUpdateIndex%>].Value = model.<%=SourceTable.Columns[i].Name%>;
+            <%iUpdateIndex++;%>
+            <%}%>
+            <%}%>
+            <%for(int i=0; i<SourceTable.Columns.Count; i++) {%>
+            <%if(SourceTable.Columns[i].IsPrimaryKeyMember) {%>
+            parameters[<%=iUpdateIndex%>].Value = model.<%=SourceTable.Columns[i].Name%>;
+            <%iUpdateIndex++;%>
+            <%}%>
+            <%}%>
+            
+            int rows=DbHelperSQL.ExecuteSql(strSql.ToString(),parameters);
+			if (rows > 0)
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+        }
+        
+        /// <summary>
+        /// 得到一个对象实体
+        /// </summary>
+        public <%=NameSpace%>.Model.<%=SourceTable.Name%> GetModel(<%=GetPrimaryKeyParas(SourceTable)%>)
+        {
+            StringBuilder strSql=new StringBuilder();
+            strSql.Append(" select TOP 1 <%=GetColumnNameList(SourceTable)%> FROM <%=SourceTable.Name%> ");
+            strSql.Append(" where <%=GetPrimaryKeyWhere(SourceTable)%> ");
+            SqlParameter[] parameters=
+            {
+                <%System.Collections.Generic.List<int> lstPrimaryGet=new System.Collections.Generic.List<int>();%>
+                <%for(int i=0; i<SourceTable.Columns.Count; i++) {%>
+                <%if(SourceTable.Columns[i].IsPrimaryKeyMember) {%>
+                <%lstPrimaryGet.Add(i);}}%>                
+                <%for(int i=0; i<lstPrimarydDel.Count; i++) {%>                
+                <%if(i == lstPrimaryGet.Count -1){%>
+                new SqlParameter("@<%=SourceTable.Columns[lstPrimaryGet[i]].Name%>", <%=GetSqlDbType(SourceTable.Columns[lstPrimaryGet[i]])%>,<%=SourceTable.Columns[lstPrimaryGet[i]].Size%>)                         
+                <%}else{%>
+                new SqlParameter("@<%=SourceTable.Columns[lstPrimaryGet[i]].Name%>", <%=GetSqlDbType(SourceTable.Columns[lstPrimaryGet[i]])%>,<%=SourceTable.Columns[lstPrimaryGet[i]].Size%>),
+                <%}%>                
+                <%}%>
+            };
+            <%int iIndexGet=0;%>
+            <%for(int i=0; i<SourceTable.Columns.Count; i++) {%>
+            <%if(SourceTable.Columns[i].IsPrimaryKeyMember) {%>
+            parameters[<%=iIndexGet%>].Value = <%=SourceTable.Columns[i].Name%>;
+            <%iIndexGet++;%>
+            <%}%>
+            <%}%>
+            DataSet ds = DbHelperSQL.Query(strSql.ToString(), parameters);
+            if (ds.Tables[0].Rows.Count > 0)
+            {
+                return DataRowToModel(ds.Tables[0].Rows[0]);
+            }
+            else
+            {
+                return null;
+            }
+        }
+        
+        /// <summary>
+        /// 得到一个对象实体
+        /// </summary>
+        public <%=NameSpace%>.Model.<%=SourceTable.Name%> DataRowToModel(DataRow row)
+        {
+            <%=NameSpace%>.Model.<%=SourceTable.Name%> model=new <%=NameSpace%>.Model.<%=SourceTable.Name%>();
+            if(row!=null)
+            {
+                <%for(int i=0; i<SourceTable.Columns.Count; i++) {%>
+                if(row.Table.Columns.Contains("<%=SourceTable.Columns[i].Name%>")&&row["<%=SourceTable.Columns[i].Name%>"]!=null&&row["<%=SourceTable.Columns[i].Name%>"]!="")
+                {
+                    model.<%=SourceTable.Columns[i].Name%>=<%=SQLConvertToCSharpDataType(SourceTable.Columns[i])%>;
+                }                
+                <%}%>
+            }
+            return model;
+        }
+        
+        /// <summary>
+        /// 得到一个DataSet
+        /// </summary>
+        public DataSet GetList(string strWhere)
+        {
+            StringBuilder strSql=new StringBuilder();
+            strSql.Append(" select <%=GetColumnNameList(SourceTable)%> ");
+            strSql.Append(" FROM <%=SourceTable.Name%> ");
+            if(strWhere.Trim()!="")
+            {
+                strSql.Append(" where "+strWhere);
+            }
+            return DbHelperSQL.Query(strSql.ToString());
+        }
+        
+        /// <summary>
+        /// 获取分页数据
+        /// </summary>
+        public DataTable GetPageList(<%=NameSpace%>.Model.<%=SourceTable.Name%> model, string sOrderField, int iPageSize, int iCurrentPageIndex, out int iCount)
+        {
+            StringBuilder sbWhere = new StringBuilder();
+            List<SqlParameter> lstParas = new List<SqlParameter>();
+            string sSql = " Select * From  (Select  ROW_NUMBER() OVER (Order By {3}) as 'RowNumber',* FROM <%=SourceTable.Name%> where 1=1 {0})temp  Where temp.RowNumber Between {1} And {2} ";
+            string sCountSql = "Select Count(1) FROM <%=SourceTable.Name%> where 1=1 {0}";
+            <%for(int i=0; i<SourceTable.Columns.Count; i++) {%>
+            <%if(GetCSharpVariableType(SourceTable.Columns[i])=="string"){%>
+            if (!string.IsNullOrEmpty(model.<%=SourceTable.Columns[i].Name%>))
+            {
+                <%if(SourceTable.Columns[i].IsPrimaryKeyMember){%>
+                sbWhere.Append(" And <%=SourceTable.Name%>.<%=SourceTable.Columns[i].Name%> = @<%=SourceTable.Columns[i].Name%> ");
+                lstParas.Add(new SqlParameter("@<%=SourceTable.Columns[i].Name%>", model.<%=SourceTable.Columns[i].Name%>));
+                <%}else{%>
+                sbWhere.Append(" And <%=SourceTable.Name%>.<%=SourceTable.Columns[i].Name%> like @<%=SourceTable.Columns[i].Name%> ");
+                lstParas.Add(new SqlParameter("@<%=SourceTable.Columns[i].Name%>", string.Format("%{0}%", model.<%=SourceTable.Columns[i].Name%>)));
+                <%}%>
+            }
+            <%}}%>   
+            sCountSql = string.Format(sCountSql, sbWhere.ToString());
+            sSql = string.Format(sSql, sbWhere.ToString(), (iCurrentPageIndex - 1) * iPageSize + 1, iCurrentPageIndex * iPageSize, sOrderField);
+            StringBuilder sbSql = new StringBuilder();
+            sbSql.Append(sSql);
+            sbSql.Append(sCountSql);
+            DataSet ds = DbHelperSQL.Query(sbSql.ToString(), lstParas);
+            iCount = Convert.ToInt32(ds.Tables[1].Rows[0][0]);
+            return ds.Tables[0];
+        }
+        
+        /// <summary>
+        /// 获取分页数据
+        /// </summary>
+        public DataTable GetPageList(<%=NameSpace%>.Model.<%=SourceTable.Name%> model, string sSDate, string sEDate, string sOrderField, int iPageSize, int iCurrentPageIndex, out int iCount)
+        {
+            StringBuilder sbWhere = new StringBuilder();
+            List<SqlParameter> lstParas = new List<SqlParameter>();
+            string sSql = " Select * From  (Select  ROW_NUMBER() OVER (Order By {3}) as 'RowNumber',* FROM <%=SourceTable.Name%> where 1=1 {0})temp  Where temp.RowNumber Between {1} And {2} ";
+            string sCountSql = "Select Count(1) FROM <%=SourceTable.Name%> where 1=1 {0}";
+            <%for(int i=0; i<SourceTable.Columns.Count; i++) {%>
+            <%if(GetCSharpVariableType(SourceTable.Columns[i])=="string"){%>
+            if (!string.IsNullOrEmpty(model.<%=SourceTable.Columns[i].Name%>))
+            {
+                <%if(SourceTable.Columns[i].IsPrimaryKeyMember){%>
+                sbWhere.Append(" And <%=SourceTable.Name%>.<%=SourceTable.Columns[i].Name%> = @<%=SourceTable.Columns[i].Name%> ");
+                lstParas.Add(new SqlParameter("@<%=SourceTable.Columns[i].Name%>", model.<%=SourceTable.Columns[i].Name%>));
+                <%}else{%>
+                sbWhere.Append(" And <%=SourceTable.Name%>.<%=SourceTable.Columns[i].Name%> like @<%=SourceTable.Columns[i].Name%> ");
+                lstParas.Add(new SqlParameter("@<%=SourceTable.Columns[i].Name%>", string.Format("%{0}%", model.<%=SourceTable.Columns[i].Name%>)));
+                <%}%>
+            }
+            <%}}%> 
+            #region 如果表中含有Datetime类型的字段，需要自行修改。模板默认为Datetime字段
+            if (!string.IsNullOrEmpty(sSDate))
+            {
+                sbWhere.Append(" And <%=SourceTable.Name%>.DateTime>=@SDate ");
+                lstParas.Add(new SqlParameter("@SDate", DateTime.Parse(sSDate)));
+            }
+            if (!string.IsNullOrEmpty(sEDate))
+            {
+                sbWhere.Append(" And <%=SourceTable.Name%>.DateTime<@EDate ");
+                lstParas.Add(new SqlParameter("@EDate", DateTime.Parse(sEDate).AddDays(1)));
+            }
+            #endregion
+            sCountSql = string.Format(sCountSql, sbWhere.ToString());
+            sSql = string.Format(sSql, sbWhere.ToString(), (iCurrentPageIndex - 1) * iPageSize + 1, iCurrentPageIndex * iPageSize, sOrderField);
+            StringBuilder sbSql = new StringBuilder();
+            sbSql.Append(sSql);
+            sbSql.Append(sCountSql);
+            DataSet ds = DbHelperSQL.Query(sbSql.ToString(), lstParas);
+            iCount = Convert.ToInt32(ds.Tables[1].Rows[0][0]);
+            return ds.Tables[0];
+        }
+        
+        /// <summary>
+        /// 获取分页数据
+        /// </summary>
+        public DataTable GetPageListByView(<%=NameSpace%>.Model.<%=SourceTable.Name%> model, string sOrderField, int iPageSize, int iCurrentPageIndex, out int iCount)
+        {
+            StringBuilder sbWhere = new StringBuilder();
+            List<SqlParameter> lstParas = new List<SqlParameter>();
+            string sSql = " Select * From  (Select  ROW_NUMBER() OVER (Order By {3}) as 'RowNumber',* FROM v_<%=SourceTable.Name%> where 1=1 {0})temp  Where temp.RowNumber Between {1} And {2} ";
+            string sCountSql = "Select Count(1) FROM v_<%=SourceTable.Name%> where 1=1 {0}";
+            <%for(int i=0; i<SourceTable.Columns.Count; i++) {%>
+            <%if(GetCSharpVariableType(SourceTable.Columns[i])=="string"){%>
+            if (!string.IsNullOrEmpty(model.<%=SourceTable.Columns[i].Name%>))
+            {
+                <%if(SourceTable.Columns[i].IsPrimaryKeyMember){%>
+                sbWhere.Append(" And v_<%=SourceTable.Name%>.<%=SourceTable.Columns[i].Name%> = @<%=SourceTable.Columns[i].Name%> ");
+                lstParas.Add(new SqlParameter("@<%=SourceTable.Columns[i].Name%>", model.<%=SourceTable.Columns[i].Name%>));
+                <%}else{%>
+                sbWhere.Append(" And v_<%=SourceTable.Name%>.<%=SourceTable.Columns[i].Name%> like @<%=SourceTable.Columns[i].Name%> ");
+                lstParas.Add(new SqlParameter("@<%=SourceTable.Columns[i].Name%>", string.Format("%{0}%", model.<%=SourceTable.Columns[i].Name%>)));
+                <%}%>
+            }
+            <%}}%>   
+            sCountSql = string.Format(sCountSql, sbWhere.ToString());
+            sSql = string.Format(sSql, sbWhere.ToString(), (iCurrentPageIndex - 1) * iPageSize + 1, iCurrentPageIndex * iPageSize, sOrderField);
+            StringBuilder sbSql = new StringBuilder();
+            sbSql.Append(sSql);
+            sbSql.Append(sCountSql);
+            DataSet ds = DbHelperSQL.Query(sbSql.ToString(), lstParas);
+            iCount = Convert.ToInt32(ds.Tables[1].Rows[0][0]);
+            return ds.Tables[0];
+        }
+        
+        /// <summary>
+        /// 获取分页数据
+        /// </summary>
+        public DataTable GetPageListByView(<%=NameSpace%>.Model.<%=SourceTable.Name%> model, string sSDate, string sEDate, string sOrderField, int iPageSize, int iCurrentPageIndex, out int iCount)
+        {
+            StringBuilder sbWhere = new StringBuilder();
+            List<SqlParameter> lstParas = new List<SqlParameter>();
+            string sSql = " Select * From  (Select  ROW_NUMBER() OVER (Order By {3}) as 'RowNumber',* FROM v_<%=SourceTable.Name%> where 1=1 {0})temp  Where temp.RowNumber Between {1} And {2} ";
+            string sCountSql = "Select Count(1) FROM v_<%=SourceTable.Name%> where 1=1 {0}";
+            <%for(int i=0; i<SourceTable.Columns.Count; i++) {%>
+            <%if(GetCSharpVariableType(SourceTable.Columns[i])=="string"){%>
+            if (!string.IsNullOrEmpty(model.<%=SourceTable.Columns[i].Name%>))
+            {
+                <%if(SourceTable.Columns[i].IsPrimaryKeyMember){%>
+                sbWhere.Append(" And v_<%=SourceTable.Name%>.<%=SourceTable.Columns[i].Name%> = @<%=SourceTable.Columns[i].Name%> ");
+                lstParas.Add(new SqlParameter("@<%=SourceTable.Columns[i].Name%>", model.<%=SourceTable.Columns[i].Name%>));
+                <%}else{%>
+                sbWhere.Append(" And v_<%=SourceTable.Name%>.<%=SourceTable.Columns[i].Name%> like @<%=SourceTable.Columns[i].Name%> ");
+                lstParas.Add(new SqlParameter("@<%=SourceTable.Columns[i].Name%>", string.Format("%{0}%", model.<%=SourceTable.Columns[i].Name%>)));
+                <%}%>
+            }
+            <%}}%>             
+            #region 如果表中含有Datetime类型的字段，需要自行修改。模板默认为Datetime字段
+            if (!string.IsNullOrEmpty(sSDate))
+            {
+                sbWhere.Append(" And v_<%=SourceTable.Name%>.DateTime>=@SDate ");
+                lstParas.Add(new SqlParameter("@SDate", DateTime.Parse(sSDate)));
+            }
+            if (!string.IsNullOrEmpty(sEDate))
+            {
+                sbWhere.Append(" And v_<%=SourceTable.Name%>.DateTime<@EDate ");
+                lstParas.Add(new SqlParameter("@EDate", DateTime.Parse(sEDate).AddDays(1)));
+            }
+            #endregion
+            sCountSql = string.Format(sCountSql, sbWhere.ToString());
+            sSql = string.Format(sSql, sbWhere.ToString(), (iCurrentPageIndex - 1) * iPageSize + 1, iCurrentPageIndex * iPageSize, sOrderField);
+            StringBuilder sbSql = new StringBuilder();
+            sbSql.Append(sSql);
+            sbSql.Append(sCountSql);
+            DataSet ds = DbHelperSQL.Query(sbSql.ToString(), lstParas);
+            iCount = Convert.ToInt32(ds.Tables[1].Rows[0][0]);
+            return ds.Tables[0];
+        }
+        
+        #endregion
+        
+        #region 添加的方法
+        
+        #endregion
+    }
+}
+
+<script runat="template">
+#region DataRowToModel转换的语句，用于判断不用的数据类型
+public string SQLConvertToCSharpDataType(ColumnSchema column)
+{
+    string CSharpType=this.GetCSharpVariableType(column);
+    switch(CSharpType)
+    {   
+        case "byte[]":return string.Format("byte[].Parse(row[\"{0}\"].ToString());",column.Name);
+        case "bool":return string.Format("bool.Parse(row[\"{0}\"].ToString());",column.Name);
+        case "byte":return string.Format("byte.Parse(row[\"{0}\"].ToString());",column.Name);
+        case "decimal":return string.Format("decimal.Parse(row[\"{0}\"].ToString());",column.Name);
+        case "DateTime":return string.Format("DateTime.Parse(row[\"{0}\"].ToString());",column.Name);
+        case "double":return string.Format("double.Parse(row[\"{0}\"].ToString());",column.Name);
+        case "Guid":return string.Format("Guid.Parse(row[\"{0}\"].ToString());",column.Name);
+        case "short":return string.Format("short.Parse(row[\"{0}\"].ToString());",column.Name);
+        case "int":return string.Format("int.Parse(row[\"{0}\"].ToString());",column.Name);
+        case "long":return string.Format("long.Parse(row[\"{0}\"].ToString());",column.Name);
+        case "sbyte":return string.Format("sbyte.Parse(row[\"{0}\"].ToString());",column.Name);
+        case "float":return string.Format("float.Parse(row[\"{0}\"].ToString());",column.Name);
+        case "TimeSpan":return string.Format("TimeSpan.Parse(row[\"{0}\"].ToString());",column.Name);
+        case "ushort":return string.Format("ushort.Parse(row[\"{0}\"].ToString());",column.Name);
+        case "uint":return string.Format("uint.Parse(row[\"{0}\"].ToString());",column.Name);
+        case "ulong":return string.Format("ulong.Parse(row[\"{0}\"].ToString());",column.Name);
+            
+        default:
+        {
+            return string.Format("row[\"{0}\"].ToString();",column.Name);
+        }
+    }
+}
+#endregion
+#region 获取列的C#数据类型
+public string GetCSharpVariableType(ColumnSchema column)
+{
+    if (column.Name.EndsWith("TypeCode")) 
+        return column.Name;
+    switch (column.DataType)
+    {
+        case DbType.AnsiString: return "string";
+        case DbType.AnsiStringFixedLength: return "string";
+        case DbType.Binary: return "byte[]";
+        case DbType.Boolean: return "bool";
+        case DbType.Byte: return "byte";
+        case DbType.Currency: return "decimal";
+        case DbType.Date: return "DateTime";
+        case DbType.DateTime: return "DateTime";
+        case DbType.Decimal: return "decimal";
+        case DbType.Double: return "double";
+        case DbType.Guid: return "Guid";
+        case DbType.Int16: return "short";
+        case DbType.Int32: return "int";
+        case DbType.Int64: return "long";
+        case DbType.Object: return "object";
+        case DbType.SByte: return "sbyte";
+        case DbType.Single: return "float";
+        case DbType.String: return "string";
+        case DbType.StringFixedLength: return "string";
+        case DbType.Time: return "TimeSpan";
+        case DbType.UInt16: return "ushort";
+        case DbType.UInt32: return "uint";
+        case DbType.UInt64: return "ulong";
+        case DbType.VarNumeric: return "decimal";
+        default:
+        {
+        return "__UNKNOWN__" + column.NativeType;
+        }
+    }
+}
+#endregion
+#region 获取列的SQL数据类型
+public string GetSqlDbType(ColumnSchema column) 
+{
+    switch (column.NativeType.ToLower())
+    {
+        case "bigint": return "SqlDbType.BigInt";
+        case "binary": return "SqlDbType.Binary";
+        case "bit": return "SqlDbType.Bit";
+        case "char": return "SqlDbType.Char";
+        case "datetime": return "SqlDbType.DateTime";
+        case "decimal": return "SqlDbType.Decimal";
+        case "float": return "SqlDbType.Float";
+        case "image": return "SqlDbType.Image";
+        case "int": return "SqlDbType.Int";
+        case "money": return "SqlDbType.Money";
+        case "nchar": return "SqlDbType.NChar";
+        case "ntext": return "SqlDbType.NText";
+        case "numeric": return "SqlDbType.Decimal";
+        case "nvarchar": return "SqlDbType.NVarChar";
+        case "real": return "SqlDbType.Real";
+        case "smalldatetime": return "SqlDbType.SmallDateTime";
+        case "smallint": return "SqlDbType.SmallInt";
+        case "smallmoney": return "SqlDbType.SmallMoney";
+        case "sql_variant": return "SqlDbType.Variant";
+        case "sysname": return "SqlDbType.NChar";
+        case "text": return "SqlDbType.Text";
+        case "timestamp": return "SqlDbType.Timestamp";
+        case "tinyint": return "SqlDbType.TinyInt";
+        case "uniqueidentifier": return "SqlDbType.UniqueIdentifier";
+        case "varbinary": return "SqlDbType.VarBinary";
+        case "varchar": return "SqlDbType.VarChar";
+        default: return "__UNKNOWN__" + column.NativeType;
+    }
+}
+#endregion
+#region 获取主键参数(包含参数的数据类型)
+public string GetPrimaryKeyParas(TableSchema table)
+{
+    System.Text.StringBuilder sbSql=new System.Text.StringBuilder();
+    foreach(ColumnSchema col in table.Columns)
+    {
+        if(col.IsPrimaryKeyMember)
+        { 
+            if(sbSql.Length==0)
+            {                
+                sbSql.Append(this.GetCSharpVariableType(col)+" "+col.Name);
+            }
+            else
+            {
+                sbSql.Append(","+this.GetCSharpVariableType(col)+" "+col.Name);
+            }
+        }
+    }
+    return sbSql.ToString();
+}
+#endregion
+#region 获取主键参数(不包含参数的数据类型)
+public string GetPrimaryKeyParasNoType(TableSchema table)
+{
+    System.Text.StringBuilder sbSql=new System.Text.StringBuilder();
+    foreach(ColumnSchema col in table.Columns)
+    {
+        if(col.IsPrimaryKeyMember)
+        { 
+            if(sbSql.Length==0)
+            {                
+                sbSql.Append(col.Name);
+            }
+            else
+            {
+                sbSql.Append(","+col.Name);
+            }
+        }
+    }
+    return sbSql.ToString();
+}
+#endregion
+#region 获取主键Where条件
+public string GetPrimaryKeyWhere(TableSchema table)
+{
+    System.Text.StringBuilder sbSql=new System.Text.StringBuilder();
+    foreach(ColumnSchema col in table.Columns)
+    {
+        if(col.IsPrimaryKeyMember)
+        { 
+            if(sbSql.Length==0)
+            {                
+                sbSql.Append(col.Name+"=@"+col.Name);                   
+            }
+            else
+            {
+                sbSql.Append(" And "+col.Name+"=@"+col.Name);            
+            }
+        }
+    }
+    return sbSql.ToString();
+}
+#endregion
+#region 获取GetPageList方法Where条件
+public string GetPageListWhere(TableSchema table)
+{
+    System.Text.StringBuilder sbSql=new System.Text.StringBuilder();
+    foreach(ColumnSchema col in table.Columns)
+    {         
+        var coltype=this.GetCSharpVariableType(col);
+        if(coltype=="string")
+        {
+            sbSql.AppendLine("if (!string.IsNullOrEmpty(model."+col.Name+"))");
+            sbSql.AppendLine("{");            
+            sbSql.AppendLine("sbWhere.Append(\" And "+table.Name+col.Name+"=@"+col.Name+" \");");
+            sbSql.AppendLine("lstParas.Add(new SqlParameter(\"@"+col.Name+"\","+ table.Name+col.Name+"));");
+            sbSql.AppendLine("}");
+        }
+    }   
+   return sbSql.ToString();
+}
+#endregion
+#region 获取表的列名集合
+public string GetColumnNameList(TableSchema table)
+{
+ string columnList = "";
+ 
+ for(int i=0; i<table.Columns.Count; i++)
+ {
+  if(columnList == string.Empty)
+   columnList = "[" + table.Columns[i].Name + "]";
+  else
+   columnList = columnList + ",[" + table.Columns[i].Name + "]";
+ }
+ 
+ return columnList;
+}
+#endregion
+#region 获取表的列名参数集合
+public string GetColumnNameListPara(TableSchema table)
+{
+ string columnList = "";
+ 
+ for(int i=0; i<table.Columns.Count; i++)
+ {
+  if(columnList == string.Empty)
+   columnList = "@" + table.Columns[i].Name;
+  else
+   columnList = columnList + ",@" + table.Columns[i].Name;
+ }
+ 
+ return columnList;
+}
+#endregion
+</script>

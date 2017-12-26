@@ -1,0 +1,98 @@
+﻿<%@ Template Language="C#" TargetLanguage="C#" %>
+<%@ Assembly Name="SchemaExplorer" %>
+<%@ Import Namespace="SchemaExplorer" %>
+<%@ Property Name="SourceTable" Type="SchemaExplorer.TableSchema" Category="数据库" %>
+<%@ Property Name="NameSpace" Type="String" Description="命名空间" %>
+<%@ Property Name="Author" Type="System.String" Default="CodeSmith" Category="Property" Description="作者名"%>
+
+using System;
+namespace <%=NameSpace%>.Model
+{
+    /// <summary>
+    /// 功能: 实体类 (<%=SourceTable.Description%>)
+    /// 创建人：<%=Author%>     
+    /// 创建日期：<%=DateTime.Now.ToShortDateString() %>    
+    /// </summary>
+    [Serializable]
+    public partial class <%=SourceTable.Name %>
+    {
+       public <%=SourceTable.Name %>() 
+       { }       
+        #region Model
+        <%for(int i=0;i<SourceTable.Columns.Count;i++){ %>
+        /// <summary>
+        /// <%=SourceTable.Columns[i].Description %>
+        /// </summary>
+        public <%=DataType2CSharpType(SourceTable.Columns[i].DataType)%> <%=SourceTable.Columns[i].Name%> {get; set;}
+        <%} %>
+        #endregion
+    }
+}
+
+<script runat="template">
+    /// <summary>
+    ///把数据库类型转化为C#类型
+    /// </summary>
+    public string DataType2CSharpType(System.Data.DbType dbType)
+    {
+        switch (dbType)
+        {
+            case DbType.AnsiString:
+                return "string";
+            case DbType.AnsiStringFixedLength:
+                return "string";
+            case DbType.Binary:
+                return "byte[]";
+            case DbType.Boolean:
+                return "bool";
+            case DbType.Byte:
+                return "byte";
+            case DbType.Currency:
+                return "decimal";
+            case DbType.Date:
+                return "DateTime";
+            case DbType.DateTime:
+                return "DateTime";
+            case DbType.DateTime2:
+                return "DateTime";
+            case DbType.DateTimeOffset:
+                return "DateTime";
+            case DbType.Decimal:
+                return "decimal";
+            case DbType.Double:
+                return "double";
+            case DbType.Guid:
+                return "Guid";
+            case DbType.Int16:
+                return "short";
+            case DbType.Int32:
+                return "int";
+            case DbType.Int64:
+                return "long";
+            case DbType.Object:
+                return "object";
+            case DbType.SByte:
+                return "sbyte";
+            case DbType.Single:
+                return "float";
+            case DbType.String:
+                return "string";
+            case DbType.StringFixedLength:
+                return "string";
+            case DbType.Time:
+                return "DateTime";
+            case DbType.UInt16:
+                return "ushort";
+            case DbType.UInt32:
+                return "uint";
+            case DbType.UInt64:
+                return "ulong";
+            case DbType.VarNumeric:
+                return "decimal";
+            case DbType.Xml:
+                return "string";
+            default:
+                return "object";
+        }
+    }
+</script>

@@ -1,0 +1,331 @@
+﻿<%@ Template Language="C#" TargetLanguage="C#" %>
+<%@ Assembly Name="SchemaExplorer" %>
+<%@ Import Namespace="SchemaExplorer" %>
+<%@ Property Name="SourceTable" Type="SchemaExplorer.TableSchema" Category="数据库" %>
+<%@ Property Name="NameSpace" Type="String" Description="命名空间" %>
+<%@ Property Name="Author" Type="System.String" Default="CodeSmith" Category="Property" Description="作者名"%>
+using System;
+using System.Data;
+using System.Collections.Generic;
+using System.IO;
+using GXEIS.Model;
+namespace <%=NameSpace %>.BLL
+{
+    /// <summary>
+    /// 功能: 实体类 (<%=SourceTable.Description%>)
+    /// 创建人：<%=Author%>     
+    /// 创建日期：<%=DateTime.Now.ToShortDateString() %>    
+    /// </summary>
+    public partial class <%=SourceTable.Name %>
+    {
+        private readonly <%=NameSpace %>.DAL.<%=SourceTable.Name %> dal=new <%=NameSpace %>.DAL.<%=SourceTable.Name %>();
+        public <%=SourceTable.Name %>()
+        {}
+        #region 生成的方法
+        /// <summary>
+		/// 是否存在该记录
+		/// </summary>
+        public bool Exists(<%=GetPrimaryKeyParas(SourceTable)%>)
+        {
+            return dal.Exists(<%=GetPrimaryKeyParasNoType(SourceTable)%>);
+        }
+        
+        /// <summary>
+        /// 增加一条数据
+        /// </summary>
+        public bool Add(<%=NameSpace%>.Model.<%=SourceTable.Name%> model)
+        {
+            return dal.Add(model);
+        }
+        
+        /// <summary>
+        /// 删除数据
+        /// </summary>
+        public bool Delete(<%=GetPrimaryKeyParas(SourceTable)%>)
+        {
+            return dal.Delete(<%=GetPrimaryKeyParasNoType(SourceTable)%>);
+        }
+        
+        /// <summary>
+        /// 更新一条数据
+        /// </summary>
+        public bool Update(<%=NameSpace%>.Model.<%=SourceTable.Name%> model)
+        {
+            return dal.Update(model);
+        }         
+        
+        /// <summary>
+        /// 得到一个对象实体
+        /// </summary>
+        public <%=NameSpace%>.Model.<%=SourceTable.Name%> GetModel(<%=GetPrimaryKeyParas(SourceTable)%>)
+        {
+            return dal.GetModel(<%=GetPrimaryKeyParasNoType(SourceTable)%>);
+        }
+        
+        /// <summary>
+        /// 得到一个DataSet
+        /// </summary>
+        public DataSet GetList(string strWhere)
+        {
+            return dal.GetList(strWhere);
+        }
+        
+        /// <summary>
+        /// 获取分页数据
+        /// </summary>
+        public DataTable GetPageList(<%=NameSpace%>.Model.<%=SourceTable.Name%> model, string sOrderField, int iPageSize, int iCurrentPageIndex, out int iCount)
+        {
+            return dal.GetPageList(model,sOrderField,iPageSize,iCurrentPageIndex,out iCount);
+        }
+        
+        /// <summary>
+        /// 获取分页数据
+        /// </summary>
+        public DataTable GetPageList(<%=NameSpace%>.Model.<%=SourceTable.Name%> model, string sSDate, string sEDate, string sOrderField, int iPageSize, int iCurrentPageIndex, out int iCount)
+        {
+            return dal.GetPageList(model,sSDate,sEDate,sOrderField,iPageSize,iCurrentPageIndex,out iCount);
+        }
+        
+        /// <summary>
+        /// 获取分页数据
+        /// </summary>
+        public DataTable GetPageListByView(<%=NameSpace%>.Model.<%=SourceTable.Name%> model, string sOrderField, int iPageSize, int iCurrentPageIndex, out int iCount)
+        {
+            return dal.GetPageListByView(model,sOrderField,iPageSize,iCurrentPageIndex,out iCount);
+        }
+        
+        /// <summary>
+        /// 获取分页数据
+        /// </summary>
+        public DataTable GetPageListByView(<%=NameSpace%>.Model.<%=SourceTable.Name%> model, string sSDate, string sEDate, string sOrderField, int iPageSize, int iCurrentPageIndex, out int iCount)
+        {
+            return dal.GetPageListByView(model,sSDate,sEDate,sOrderField,iPageSize,iCurrentPageIndex,out iCount);
+        }
+        #endregion
+        
+        #region 添加的方法
+        
+        #endregion
+    }
+}
+
+
+<script runat="template">
+#region DataRowToModel转换的语句，用于判断不用的数据类型
+public string SQLConvertToCSharpDataType(ColumnSchema column)
+{
+    string CSharpType=this.GetCSharpVariableType(column);
+    switch(CSharpType)
+    {   
+        case "byte[]":return string.Format("byte[].Parse(row[\"{0}\"].ToString());",column.Name);
+        case "bool":return string.Format("bool.Parse(row[\"{0}\"].ToString());",column.Name);
+        case "byte":return string.Format("byte.Parse(row[\"{0}\"].ToString());",column.Name);
+        case "decimal":return string.Format("decimal.Parse(row[\"{0}\"].ToString());",column.Name);
+        case "DateTime":return string.Format("DateTime.Parse(row[\"{0}\"].ToString());",column.Name);
+        case "double":return string.Format("double.Parse(row[\"{0}\"].ToString());",column.Name);
+        case "Guid":return string.Format("Guid.Parse(row[\"{0}\"].ToString());",column.Name);
+        case "short":return string.Format("short.Parse(row[\"{0}\"].ToString());",column.Name);
+        case "int":return string.Format("int.Parse(row[\"{0}\"].ToString());",column.Name);
+        case "long":return string.Format("long.Parse(row[\"{0}\"].ToString());",column.Name);
+        case "sbyte":return string.Format("sbyte.Parse(row[\"{0}\"].ToString());",column.Name);
+        case "float":return string.Format("float.Parse(row[\"{0}\"].ToString());",column.Name);
+        case "TimeSpan":return string.Format("TimeSpan.Parse(row[\"{0}\"].ToString());",column.Name);
+        case "ushort":return string.Format("ushort.Parse(row[\"{0}\"].ToString());",column.Name);
+        case "uint":return string.Format("uint.Parse(row[\"{0}\"].ToString());",column.Name);
+        case "ulong":return string.Format("ulong.Parse(row[\"{0}\"].ToString());",column.Name);
+            
+        default:
+        {
+            return string.Format("row[\"{0}\"].ToString();",column.Name);
+        }
+    }
+}
+#endregion
+#region 获取列的C#数据类型
+public string GetCSharpVariableType(ColumnSchema column)
+{
+    if (column.Name.EndsWith("TypeCode")) 
+        return column.Name;
+    switch (column.DataType)
+    {
+        case DbType.AnsiString: return "string";
+        case DbType.AnsiStringFixedLength: return "string";
+        case DbType.Binary: return "byte[]";
+        case DbType.Boolean: return "bool";
+        case DbType.Byte: return "byte";
+        case DbType.Currency: return "decimal";
+        case DbType.Date: return "DateTime";
+        case DbType.DateTime: return "DateTime";
+        case DbType.Decimal: return "decimal";
+        case DbType.Double: return "double";
+        case DbType.Guid: return "Guid";
+        case DbType.Int16: return "short";
+        case DbType.Int32: return "int";
+        case DbType.Int64: return "long";
+        case DbType.Object: return "object";
+        case DbType.SByte: return "sbyte";
+        case DbType.Single: return "float";
+        case DbType.String: return "string";
+        case DbType.StringFixedLength: return "string";
+        case DbType.Time: return "TimeSpan";
+        case DbType.UInt16: return "ushort";
+        case DbType.UInt32: return "uint";
+        case DbType.UInt64: return "ulong";
+        case DbType.VarNumeric: return "decimal";
+        default:
+        {
+        return "__UNKNOWN__" + column.NativeType;
+        }
+    }
+}
+#endregion
+#region 获取列的SQL数据类型
+public string GetSqlDbType(ColumnSchema column) 
+{
+    switch (column.NativeType.ToLower())
+    {
+        case "bigint": return "SqlDbType.BigInt";
+        case "binary": return "SqlDbType.Binary";
+        case "bit": return "SqlDbType.Bit";
+        case "char": return "SqlDbType.Char";
+        case "datetime": return "SqlDbType.DateTime";
+        case "decimal": return "SqlDbType.Decimal";
+        case "float": return "SqlDbType.Float";
+        case "image": return "SqlDbType.Image";
+        case "int": return "SqlDbType.Int";
+        case "money": return "SqlDbType.Money";
+        case "nchar": return "SqlDbType.NChar";
+        case "ntext": return "SqlDbType.NText";
+        case "numeric": return "SqlDbType.Decimal";
+        case "nvarchar": return "SqlDbType.NVarChar";
+        case "real": return "SqlDbType.Real";
+        case "smalldatetime": return "SqlDbType.SmallDateTime";
+        case "smallint": return "SqlDbType.SmallInt";
+        case "smallmoney": return "SqlDbType.SmallMoney";
+        case "sql_variant": return "SqlDbType.Variant";
+        case "sysname": return "SqlDbType.NChar";
+        case "text": return "SqlDbType.Text";
+        case "timestamp": return "SqlDbType.Timestamp";
+        case "tinyint": return "SqlDbType.TinyInt";
+        case "uniqueidentifier": return "SqlDbType.UniqueIdentifier";
+        case "varbinary": return "SqlDbType.VarBinary";
+        case "varchar": return "SqlDbType.VarChar";
+        default: return "__UNKNOWN__" + column.NativeType;
+    }
+}
+#endregion
+#region 获取主键参数(包含参数的数据类型)
+public string GetPrimaryKeyParas(TableSchema table)
+{
+    System.Text.StringBuilder sbSql=new System.Text.StringBuilder();
+    foreach(ColumnSchema col in table.Columns)
+    {
+        if(col.IsPrimaryKeyMember)
+        { 
+            if(sbSql.Length==0)
+            {                
+                sbSql.Append(this.GetCSharpVariableType(col)+" "+col.Name);
+            }
+            else
+            {
+                sbSql.Append(","+this.GetCSharpVariableType(col)+" "+col.Name);
+            }
+        }
+    }
+    return sbSql.ToString();
+}
+#endregion
+#region 获取主键参数(不包含参数的数据类型)
+public string GetPrimaryKeyParasNoType(TableSchema table)
+{
+    System.Text.StringBuilder sbSql=new System.Text.StringBuilder();
+    foreach(ColumnSchema col in table.Columns)
+    {
+        if(col.IsPrimaryKeyMember)
+        { 
+            if(sbSql.Length==0)
+            {                
+                sbSql.Append(col.Name);
+            }
+            else
+            {
+                sbSql.Append(","+col.Name);
+            }
+        }
+    }
+    return sbSql.ToString();
+}
+#endregion
+#region 获取主键Where条件
+public string GetPrimaryKeyWhere(TableSchema table)
+{
+    System.Text.StringBuilder sbSql=new System.Text.StringBuilder();
+    foreach(ColumnSchema col in table.Columns)
+    {
+        if(col.IsPrimaryKeyMember)
+        { 
+            if(sbSql.Length==0)
+            {                
+                sbSql.Append(col.Name+"=@"+col.Name);                   
+            }
+            else
+            {
+                sbSql.Append(" And "+col.Name+"=@"+col.Name);            
+            }
+        }
+    }
+    return sbSql.ToString();
+}
+#endregion
+#region 获取GetPageList方法Where条件
+public string GetPageListWhere(TableSchema table)
+{
+    System.Text.StringBuilder sbSql=new System.Text.StringBuilder();
+    foreach(ColumnSchema col in table.Columns)
+    {         
+        var coltype=this.GetCSharpVariableType(col);
+        if(coltype=="string")
+        {
+            sbSql.AppendLine("if (!string.IsNullOrEmpty(model."+col.Name+"))");
+            sbSql.AppendLine("{");            
+            sbSql.AppendLine("sbWhere.Append(\" And "+table.Name+col.Name+"=@"+col.Name+" \");");
+            sbSql.AppendLine("lstParas.Add(new SqlParameter(\"@"+col.Name+"\","+ table.Name+col.Name+"));");
+            sbSql.AppendLine("}");
+        }
+    }   
+   return sbSql.ToString();
+}
+#endregion
+#region 获取表的列名集合
+public string GetColumnNameList(TableSchema table)
+{
+ string columnList = "";
+ 
+ for(int i=0; i<table.Columns.Count; i++)
+ {
+  if(columnList == string.Empty)
+   columnList = "[" + table.Columns[i].Name + "]";
+  else
+   columnList = columnList + ",[" + table.Columns[i].Name + "]";
+ }
+ 
+ return columnList;
+}
+#endregion
+#region 获取表的列名参数集合
+public string GetColumnNameListPara(TableSchema table)
+{
+ string columnList = "";
+ 
+ for(int i=0; i<table.Columns.Count; i++)
+ {
+  if(columnList == string.Empty)
+   columnList = "@" + table.Columns[i].Name;
+  else
+   columnList = columnList + ",@" + table.Columns[i].Name;
+ }
+ 
+ return columnList;
+}
+#endregion
+</script>
