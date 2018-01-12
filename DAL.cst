@@ -189,6 +189,58 @@ namespace <%=NameSpace %>.DAL
         }
         
         /// <summary>
+        /// 提交一条数据(存在则修改，不存在则添加)
+        /// </summary>
+        public bool Modify(<%=NameSpace%>.Model.<%=SourceTable.Name%> model)
+        {
+            <%System.Collections.Generic.List<int> lstModifyPrimary=new System.Collections.Generic.List<int>();%>
+            <%System.Collections.Generic.List<int> lstModifyNoPrimary=new System.Collections.Generic.List<int>();%>
+            StringBuilder strSql=new StringBuilder();
+            strSql.Append(" IF(exists(SELECT 1 from <%=SourceTable.Name%> where <%=GetPrimaryKeyWhere(SourceTable)%> )) ");   
+            strSql.Append(" begin ");            
+            strSql.Append("     update <%=SourceTable.Name%> set ");    
+            <%for(int i=0; i<SourceTable.Columns.Count; i++) {%>
+            <%if(SourceTable.Columns[i].IsPrimaryKeyMember) {%>
+            <%lstModifyPrimary.Add(i);%>     
+            <%}else{lstModifyNoPrimary.Add(i);}}%>
+            <%for(int i=0; i<lstModifyNoPrimary.Count; i++) {%>                              
+            <%if(i == lstModifyNoPrimary.Count -1){%>
+            strSql.Append("     <%=SourceTable.Columns[lstModifyNoPrimary[i]].Name%>=@<%=SourceTable.Columns[lstModifyNoPrimary[i]].Name%>");            
+            <%}else{%>
+            strSql.Append("     <%=SourceTable.Columns[lstModifyNoPrimary[i]].Name%>=@<%=SourceTable.Columns[lstModifyNoPrimary[i]].Name%>,");
+            <%}%>                
+            <%}%>            
+            strSql.Append("     where <%=GetPrimaryKeyWhere(SourceTable)%> ");            
+            strSql.Append(" end ");
+            strSql.Append(" else ");
+            strSql.Append(" begin ");            
+            strSql.Append("     insert into <%=SourceTable.Name%>( ");
+            strSql.Append("     <%=GetColumnNameList(SourceTable)%>) ");
+            strSql.Append("     values ( ");
+            strSql.Append("     <%=GetColumnNameListPara(SourceTable)%>) ");            
+            strSql.Append(" end ");            
+            SqlParameter[] parameters = 
+            {
+                <%for(int i=0; i<SourceTable.Columns.Count; i++) {%>
+                <%if(i == SourceTable.Columns.Count -1){%>new SqlParameter("@<%=SourceTable.Columns[i].Name%>", <%=GetSqlDbType(SourceTable.Columns[i])%>,<%=SourceTable.Columns[i].Size%>)<%}else{%>new SqlParameter("@<%=SourceTable.Columns[i].Name%>", <%=GetSqlDbType(SourceTable.Columns[i])%>,<%=SourceTable.Columns[i].Size%>),<%}%>
+                <%}%>
+            };
+            <%for(int i=0; i<SourceTable.Columns.Count; i++) {%>
+            parameters[<%=i%>].Value = model.<%=SourceTable.Columns[i].Name%>;
+            <%}%>
+            
+            int rows=DbHelperSQL.ExecuteSql(strSql.ToString(),parameters);
+			if (rows > 0)
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+        }
+        
+        /// <summary>
         /// 得到一个对象实体
         /// </summary>
         public <%=NameSpace%>.Model.<%=SourceTable.Name%> GetModel(<%=GetPrimaryKeyParas(SourceTable)%>)

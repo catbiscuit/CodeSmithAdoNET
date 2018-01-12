@@ -55,6 +55,13 @@ namespace <%=NameSpace %>.BLL
         }         
         
         /// <summary>
+        /// 提交一条数据(存在则修改，不存在则添加)
+        /// </summary>
+        public bool Modify(<%=NameSpace%>.Model.<%=SourceTable.Name%> model)
+        {
+            return dal.Modify(model);
+        }
+        /// <summary>
         /// 得到一个对象实体
         /// </summary>
         public <%=NameSpace%>.Model.<%=SourceTable.Name%> GetModel(<%=GetPrimaryKeyParas(SourceTable)%>)
