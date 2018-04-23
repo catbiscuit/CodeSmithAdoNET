@@ -50,37 +50,37 @@ namespace <%=NameSpace%>.Model
             case DbType.Currency:
                 return "decimal";
             case DbType.Date:
-                return "DateTime";
+                return "DateTime?";
             case DbType.DateTime:
-                return "DateTime";
+                return "DateTime?";
             case DbType.DateTime2:
-                return "DateTime";
+                return "DateTime?";
             case DbType.DateTimeOffset:
-                return "DateTime";
+                return "DateTime?";
             case DbType.Decimal:
-                return "decimal";
+                return "decimal?";
             case DbType.Double:
-                return "double";
+                return "double?";
             case DbType.Guid:
                 return "Guid";
             case DbType.Int16:
-                return "short";
+                return "short?";
             case DbType.Int32:
-                return "int";
+                return "int?";
             case DbType.Int64:
-                return "long";
+                return "long?";
             case DbType.Object:
                 return "object";
             case DbType.SByte:
                 return "sbyte";
             case DbType.Single:
-                return "float";
+                return "float>";
             case DbType.String:
                 return "string";
             case DbType.StringFixedLength:
                 return "string";
             case DbType.Time:
-                return "DateTime";
+                return "DateTime?";
             case DbType.UInt16:
                 return "ushort";
             case DbType.UInt32:
@@ -88,7 +88,7 @@ namespace <%=NameSpace%>.Model
             case DbType.UInt64:
                 return "ulong";
             case DbType.VarNumeric:
-                return "decimal";
+                return "decimal?";
             case DbType.Xml:
                 return "string";
             default:
