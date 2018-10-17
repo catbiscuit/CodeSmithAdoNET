@@ -31,7 +31,7 @@
         BLL bll=new BLL();
         foreach(var i in DatabaseSchema.Tables)
         {
-            dal.SetProperty("Author",Author);            
+            bll.SetProperty("Author",Author);            
             bll.SetProperty("NameSpace",NameSpace);
             bll.SetProperty("SourceTable",i);
             this.CopyPropertiesTo(bll);
@@ -41,7 +41,7 @@
          Model model=new Model();
         foreach(var i in DatabaseSchema.Tables)
         {
-            dal.SetProperty("Author",Author);            
+            model.SetProperty("Author",Author);            
             model.SetProperty("NameSpace",NameSpace);
             model.SetProperty("SourceTable",i);
             this.CopyPropertiesTo(model);
