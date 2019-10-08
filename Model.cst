@@ -74,7 +74,7 @@ namespace <%=NameSpace%>.Model
             case DbType.SByte:
                 return "sbyte";
             case DbType.Single:
-                return "float>";
+                return "float?";
             case DbType.String:
                 return "string";
             case DbType.StringFixedLength:
